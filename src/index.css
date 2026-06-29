@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* offset para navbar fixa ao usar âncoras */
+    scroll-padding-top: 80px;
+  }
+
+  body {
+    @apply bg-alpha-black text-white font-body antialiased;
+    /* Background aprimorado: preto profundo + gradientes radiais sutis + textura */
+    background-color: #0d0d0d;
+    background-image:
+      /* Glow vermelho sutil no topo direito */
+      radial-gradient(ellipse 80% 60% at 100% 0%, rgba(229, 62, 62, 0.08), transparent 60%),
+      /* Glow vermelho sutil no fundo esquerdo */
+      radial-gradient(ellipse 60% 50% at 0% 100%, rgba(229, 62, 62, 0.05), transparent 60%),
+      /* Vinheta central sutil para profundidade */
+      radial-gradient(ellipse 100% 80% at 50% 50%, transparent 50%, rgba(0, 0, 0, 0.4)),
+      /* Textura de ruído sutil (padrão hexagonal de baixa opacidade) */
+      linear-gradient(135deg, transparent 0%, transparent 49.5%, rgba(229, 62, 62, 0.015) 49.5%, rgba(229, 62, 62, 0.015) 50.5%, transparent 50.5%);
+    background-attachment: fixed;
+    background-size: 100% 100%, 100% 100%, 100% 100%, 24px 24px;
+    min-height: 100vh;
+  }
+
+  ::selection {
+    background-color: #e53e3e;
+    color: #fff;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3
+           bg-alpha-red hover:bg-alpha-red-dark text-white font-semibold
+           uppercase tracking-wide rounded-md transition-all duration-200
+           shadow-lg shadow-alpha-red/20 hover:shadow-alpha-red/40
+           hover:-translate-y-0.5 active:translate-y-0;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3
+           border border-alpha-gray-line hover:border-alpha-red
+           text-white hover:text-alpha-red font-semibold
+           uppercase tracking-wide rounded-md transition-all duration-200;
+  }
+
+  .section-title {
+    @apply font-display text-3xl sm:text-5xl md:text-6xl uppercase tracking-wide leading-none;
+  }
+
+  .section-eyebrow {
+    @apply inline-block text-alpha-red font-semibold uppercase tracking-[0.2em] sm:tracking-[0.25em] text-xs sm:text-sm mb-3;
+  }
+
+  /* Card com borda vermelha sutil + fundo elevado (substitui o preto chapado) */
+  .card-elevated {
+    @apply bg-alpha-black-card border border-alpha-gray-line/60 rounded-2xl;
+    background-image: linear-gradient(135deg, rgba(38, 38, 38, 0.95) 0%, rgba(26, 26, 26, 0.95) 100%);
+    box-shadow: 0 4px 24px -8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  }
+
+  /* Padrão de hexágonos decorativo (estilo martial arts) */
+  .bg-hex-pattern {
+    background-image:
+      radial-gradient(circle at 50% 50%, rgba(229, 62, 62, 0.03) 1px, transparent 1px),
+      linear-gradient(60deg, rgba(255, 255, 255, 0.015) 25%, transparent 25.5%, transparent 75%, rgba(255, 255, 255, 0.015) 75%),
+      linear-gradient(-60deg, rgba(255, 255, 255, 0.015) 25%, transparent 25.5%, transparent 75%, rgba(255, 255, 255, 0.015) 75%);
+    background-size: 28px 48px, 28px 48px, 28px 48px;
+  }
+
+  /* Padrão de linhas diagonais (estilo carbono) */
+  .bg-carbon {
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(229, 62, 62, 0.015) 10px,
+      rgba(229, 62, 62, 0.015) 11px
+    );
+  }
+}
+
+/* Scrollbar dark com vermelho no hover */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0d0d0d;
+}
+::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #e53e3e;
+}
