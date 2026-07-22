@@ -64,7 +64,7 @@ export default function AdminLogin() {
               autoComplete="email"
               autoFocus
               className="w-full px-4 py-3 rounded-md bg-alpha-black border border-alpha-gray-line text-white placeholder:text-white/30 focus:border-alpha-red focus:outline-none focus:ring-2 focus:ring-alpha-red/30 transition-colors"
-              placeholder="thiago@teamalpha.com.br"
+              placeholder="usuario@teamalpha.com.br"
             />
           </div>
 
