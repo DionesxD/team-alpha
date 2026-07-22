@@ -29,7 +29,7 @@ export const unidades = [
     id: 'acqua-club',
     nome: 'Unidade AcquaClub',
     apelido: 'AcquaClub',
-    endereco: 'Avenida Covancá, 58',
+    endereco: 'Avenida Covanca, 58 - Parque Lafaiete',
     cidade: 'Rio de Janeiro — RJ',
     horarios: [
       { dias: 'Seg · Qua', horario: '20h às 21h30' },
@@ -37,7 +37,7 @@ export const unidades = [
     modalidades: ['Kickboxing', 'MMA'],
     destaque: false,
     whatsapp: '5521999999999', // TODO: WHATSAPP_UNIDADE_ACQUA
-    mapsEmbed: 'https://www.google.com/maps?q=Avenida+Covanca+58+Rio+de+Janeiro&output=embed',
+    mapsEmbed: 'https://www.google.com/maps?q=Parque+Lafayette+Avenida+Covanca+Rio+de+Janeiro&output=embed',
     mapsLink: 'https://maps.app.goo.gl/se2o4rpjBfrhBykr6',
   },
   {
