@@ -1,6 +1,27 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 
+// ⚙️ PARAMETRIZAÇÃO — edite estes valores para ajustar os limites
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024      // 5 MB
+const MAX_VIDEO_SIZE = 10 * 1024 * 1024     // 10 MB
+const MAX_VIDEO_DURATION = 30               // 30 segundos
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+const ACCEPTED_VIDEO_TYPES = ['video/mp4', 'video/webm']
+
+// Helper: extrai duração do vídeo em segundos
+function getVideoDuration(file) {
+  return new Promise((resolve) => {
+    const video = document.createElement('video')
+    video.preload = 'metadata'
+    video.onloadedmetadata = () => {
+      resolve(video.duration)
+      URL.revokeObjectURL(video.src)
+    }
+    video.onerror = () => resolve(0)
+    video.src = URL.createObjectURL(file)
+  })
+}
+
 export default function AdminEditarFoto({ foto, onSaved, onCancel }) {
   const isEditing = Boolean(foto?.id)
   const [titulo, setTitulo] = useState(foto?.titulo || '')
@@ -8,22 +29,54 @@ export default function AdminEditarFoto({ foto, onSaved, onCancel }) {
   const [destaque, setDestaque] = useState(foto?.destaque || false)
   const [ordem, setOrdem] = useState(foto?.ordem ?? 0)
   const [file, setFile] = useState(null)
+  const [tipo, setTipo] = useState(foto?.tipo || 'imagem')
   const [preview, setPreview] = useState(foto?.imagem_url || '')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const f = e.target.files?.[0]
     if (!f) return
-    if (!f.type.startsWith('image/')) {
-      setError('Selecione um arquivo de imagem válido.')
-      return
-    }
-    if (f.size > 5 * 1024 * 1024) {
-      setError('Imagem muito grande. Máximo: 5 MB.')
-      return
-    }
+
     setError('')
+
+    // Detecta tipo
+    const isVideo = f.type.startsWith('video/')
+    const isImage = f.type.startsWith('image/')
+    const novoTipo = isVideo ? 'video' : 'imagem'
+
+    if (isVideo) {
+      // Valida tipo
+      if (!ACCEPTED_VIDEO_TYPES.includes(f.type)) {
+        setError('Vídeo deve ser MP4 ou WebM.')
+        return
+      }
+      // Valida tamanho
+      if (f.size > MAX_VIDEO_SIZE) {
+        setError(`Vídeo muito grande. Máximo: ${MAX_VIDEO_SIZE / 1024 / 1024} MB.`)
+        return
+      }
+      // Valida duração
+      const duration = await getVideoDuration(f)
+      if (duration > MAX_VIDEO_DURATION) {
+        setError(`Vídeo muito longo: ${duration.toFixed(0)}s. Máximo: ${MAX_VIDEO_DURATION}s.`)
+        return
+      }
+    } else if (isImage) {
+      if (!ACCEPTED_IMAGE_TYPES.includes(f.type)) {
+        setError('Imagem deve ser JPG, PNG ou WebP.')
+        return
+      }
+      if (f.size > MAX_IMAGE_SIZE) {
+        setError(`Imagem muito grande. Máximo: ${MAX_IMAGE_SIZE / 1024 / 1024} MB.`)
+        return
+      }
+    } else {
+      setError('Selecione um arquivo de imagem ou vídeo válido.')
+      return
+    }
+
+    setTipo(novoTipo)
     setFile(f)
     setPreview(URL.createObjectURL(f))
   }
@@ -62,7 +115,7 @@ export default function AdminEditarFoto({ foto, onSaved, onCancel }) {
           await supabase.storage.from('galeria').remove([foto.imagem_path])
         }
       } else if (!isEditing) {
-        throw new Error('Selecione uma imagem.')
+        throw new Error('Selecione uma imagem ou vídeo.')
       }
 
       const payload = {
@@ -72,6 +125,7 @@ export default function AdminEditarFoto({ foto, onSaved, onCancel }) {
         imagem_path,
         destaque,
         ordem: Number(ordem) || 0,
+        tipo,
       }
 
       if (isEditing) {
@@ -100,11 +154,9 @@ export default function AdminEditarFoto({ foto, onSaved, onCancel }) {
     if (!confirm('Tem certeza que deseja excluir esta foto?')) return
     setLoading(true)
     try {
-      // Deleta imagem do storage
       if (foto?.imagem_path) {
         await supabase.storage.from('galeria').remove([foto.imagem_path])
       }
-      // Deleta registro do banco
       const { error: deleteError } = await supabase
         .from('galeria_fotos')
         .delete()
@@ -127,26 +179,35 @@ export default function AdminEditarFoto({ foto, onSaved, onCancel }) {
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Preview da imagem */}
+            {/* Preview da imagem/vídeo */}
             {preview && (
-              <div className="relative aspect-video rounded-lg overflow-hidden border border-alpha-gray-line">
-                <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+              <div className="relative aspect-video rounded-lg overflow-hidden border border-alpha-gray-line bg-alpha-black">
+                {tipo === 'video' ? (
+                  <video src={preview} controls className="w-full h-full object-cover" />
+                ) : (
+                  <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+                )}
+                {tipo === 'video' && (
+                  <span className="absolute top-2 left-2 px-2 py-1 rounded-full bg-alpha-red text-white text-[10px] font-bold uppercase tracking-wider">
+                    ▶ Vídeo
+                  </span>
+                )}
               </div>
             )}
 
-            {/* Upload de imagem */}
+            {/* Upload */}
             <div>
               <label className="block text-xs uppercase tracking-wider text-white/60 mb-2 font-semibold">
-                {isEditing ? 'Trocar imagem (opcional)' : 'Imagem *'}
+                {isEditing ? 'Trocar arquivo (opcional)' : 'Arquivo *'}
               </label>
               <input
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"
                 onChange={handleFileChange}
                 className="block w-full text-sm text-white/70 file:mr-4 file:py-2.5 file:px-4 file:rounded-md file:border-0 file:bg-alpha-red file:text-white file:font-semibold file:uppercase file:tracking-wider file:cursor-pointer hover:file:bg-alpha-red-dark file:transition-colors cursor-pointer"
               />
               <p className="text-white/40 text-xs mt-1.5">
-                JPG, PNG ou WebP · máx 5 MB · recomendado: 1200×800 ou maior
+                Imagem: JPG/PNG/WebP até {MAX_IMAGE_SIZE / 1024 / 1024} MB · Vídeo: MP4/WebM até {MAX_VIDEO_SIZE / 1024 / 1024} MB e {MAX_VIDEO_DURATION}s
               </p>
             </div>
 
@@ -227,7 +288,7 @@ export default function AdminEditarFoto({ foto, onSaved, onCancel }) {
                 disabled={loading}
                 className="btn-primary flex-1 disabled:opacity-60"
               >
-                {loading ? 'Salvando…' : isEditing ? 'Salvar alterações' : 'Adicionar foto'}
+                {loading ? 'Salvando…' : isEditing ? 'Salvar alterações' : 'Adicionar'}
               </button>
               <button
                 type="button"
