@@ -37,7 +37,7 @@ export const unidades = [
     modalidades: ['Kickboxing', 'MMA'],
     destaque: false,
     whatsapp: '5521999999999', // TODO: WHATSAPP_UNIDADE_ACQUA
-    mapsEmbed: 'https://www.google.com/maps?q=Parque+Lafaiete+Avenida+Covanca+Rio+de+Janeiro&output=embed',
+    mapsEmbed: 'https://www.google.com/maps?q=Lafaiete+Acqua+Club+Avenida+Covanca+Rio+de+Janeiro&output=embed',
     mapsLink: 'https://maps.app.goo.gl/se2o4rpjBfrhBykr6',
   },
   {
