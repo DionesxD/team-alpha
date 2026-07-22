@@ -192,7 +192,61 @@ Edite o array `professores` em `src/components/Professores.jsx` para ajustar nom
 
 ---
 
-## Deploy no Vercel
+## Painel administrativo (galeria dinâmica)
+
+O site tem um painel admin em **`/admin`** (ex: `seusite.vercel.app/admin`) onde o mestre
+Thiago faz login com e-mail + senha e gerencia as fotos da galeria sem precisar mexer no
+código — adicionar, editar, excluir e marcar como destaque.
+
+### Setup (uma única vez)
+
+#### 1. Configure o Supabase
+1. Crie conta gratuita em [supabase.com](https://supabase.com) e crie um projeto novo.
+2. No painel do projeto, vá em **SQL Editor → New query**.
+3. Cole o conteúdo do arquivo **`supabase-setup.sql`** (na raiz deste projeto) e clique em **Run**.
+   - Isso cria a tabela `galeria_fotos`, o bucket de storage `galeria` e as políticas de segurança (RLS).
+4. Em **Settings → API** (ou Connect → ORMs), copie:
+   - `Project URL` (ex: `https://naamdyaxwahbqjmbvwnu.supabase.co`)
+   - `anon public key` (string longa começando com `eyJ...`)
+
+#### 2. Configure as variáveis de ambiente
+Crie um arquivo `.env` na raiz do projeto (ou nas variáveis de ambiente do Vercel):
+
+```bash
+VITE_SUPABASE_URL=https://naamdyaxwahbqjmbvwnu.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJ...sua_anon_key_aqui...
+```
+
+#### 3. Crie o usuário do mestre Thiago
+1. No painel do Supabase, vá em **Authentication → Users → Add user**.
+2. Preencha:
+   - **Email**: `thiago@teamalpha.com.br` (ou o e-mail real dele)
+   - **Password**: uma senha inicial (ele pode trocar depois)
+   - Marque **"Auto Confirm User"** para não precisar validar e-mail.
+3. Clique em **Create user**.
+
+#### 4. Pronto!
+- Acesse `seusite.vercel.app/admin`
+- Thiago faz login com o e-mail + senha criados
+- Ele vê a galeria atual, pode adicionar/editar/excluir fotos
+- As mudanças aparecem no site **instantaneamente** (sem rebuild)
+
+### Segurança
+
+- As 2 chaves (`VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY`) são **públicas por design** —
+  o Supabase usa "Row Level Security" no banco para garantir que:
+  - ✅ Qualquer visitante pode **LER** as fotos (para o site funcionar)
+  - ❌ Apenas usuários autenticados (o Thiago) podem **criar/editar/excluir**
+- A senha do banco PostgreSQL (a que você definiu ao criar o projeto) **NÃO** vai no código
+  e não deve ser compartilhada.
+
+### Custo
+- **Supabase Free**: 1 GB storage + 50K requisições/mês
+- Para uma academia com 1 admin editando galeria semanalmente: **R$ 0 para sempre**
+
+---
+
+
 
 Você tem **3 formas** de fazer o deploy. Escolha a que preferir.
 
@@ -221,10 +275,12 @@ Você tem **3 formas** de fazer o deploy. Escolha a que preferir.
    - **Build Command**: `npm run build` (já vem preenchido)
    - **Output Directory**: `dist` (já vem preenchido)
    - **Install Command**: `npm install` (já vem preenchido)
-8. **Variáveis de ambiente** (opcional — só se quiser sobrescrever o embed do mapa): em **Environment Variables**, adicione:
-   | Name | Value | Onde pegar |
-   |------|-------|-----------|
-   | `VITE_GOOGLE_MAPS_EMBED_URL` | `https://www.google.com/maps/embed?pb=...` | Google Maps → Compartilhar → Incorporar mapa. Se não preencher, o site usa o endereço da Matriz por padrão. |
+8. **Variáveis de ambiente** (obrigatório para o painel admin funcionar): em **Environment Variables**, adicione:
+   | Name | Value |
+   |------|-------|
+   | `VITE_SUPABASE_URL` | `https://naamdyaxwahbqjmbvwnu.supabase.co` (sua URL real) |
+   | `VITE_SUPABASE_ANON_KEY` | `eyJ...` (sua anon key real) |
+   | `VITE_GOOGLE_MAPS_EMBED_URL` | (opcional) URL do embed do Google Maps, se quiser sobrescrever o padrão da Matriz |
 9. Clique em **Deploy**. Em ~1 minuto seu site estará no ar em `https://team-alpha.vercel.app` (URL varia conforme o nome do repositório).
 
 Pronto! A partir de agora, toda vez que você fizer `git push` para a `main`, o Vercel refaz o deploy automaticamente.

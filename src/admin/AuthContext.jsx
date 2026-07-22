@@ -1,0 +1,47 @@
+import { createContext, useContext, useEffect, useState } from 'react'
+import { supabase } from '../lib/supabase'
+
+const AuthContext = createContext(null)
+
+export function AuthProvider({ children }) {
+  const [session, setSession] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    // Carrega sessão atual (persistida no localStorage)
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session)
+      setLoading(false)
+    })
+
+    // Escuta mudanças de auth (login, logout, refresh)
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession)
+    })
+
+    return () => sub.subscription.unsubscribe()
+  }, [])
+
+  const signIn = async (email, password) => {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) throw error
+    return data
+  }
+
+  const signOut = async () => {
+    await supabase.auth.signOut()
+    setSession(null)
+  }
+
+  return (
+    <AuthContext.Provider value={{ session, loading, signIn, signOut }}>
+      {children}
+    </AuthContext.Provider>
+  )
+}
+
+export function useAuth() {
+  const ctx = useContext(AuthContext)
+  if (!ctx) throw new Error('useAuth deve ser usado dentro de <AuthProvider>')
+  return ctx
+}

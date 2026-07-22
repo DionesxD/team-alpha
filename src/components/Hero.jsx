@@ -108,7 +108,7 @@ export default function Hero() {
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-alpha-red via-alpha-red-dark to-alpha-red" />
 
               {/* Etiqueta com nome do professor no canto SUPERIOR ESQUERDO */}
-              <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 z-10">
+              <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10">
                 <div className="inline-flex flex-col bg-alpha-black/85 backdrop-blur-md border border-alpha-red/50 rounded-lg px-4 py-2.5 sm:px-5 sm:py-3 shadow-lg">
                   <span className="text-[10px] sm:text-xs uppercase tracking-[0.25em] text-alpha-red font-semibold mb-0.5">
                     Prof. Treinador

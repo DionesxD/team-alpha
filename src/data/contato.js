@@ -10,13 +10,13 @@
 // Exemplo Brasil: 55 (DDI) + 21 (DDD) + 999999999 = '5521999999999'
 // TODO: substitua pelos números reais do time.
 export const WHATSAPP = {
-  thiago: '5521966956173',   // Prof. Treinador Thiago Barbudo (Kickboxing / MMA)
-  geral: '5521966956173',    // Atendimento geral do time
+  thiago: '5521999999999',   // Prof. Treinador Thiago Barbudo (Kickboxing / MMA)
+  geral: '5521999999999',    // Atendimento geral do time
 }
 
 // Mensagens pré-preenchidas para cada contexto de contato.
 export const MENSAGENS = {
-  thiago: 'Olá Mestre Thiago, tenho interesse em treinar na Team Alpha!',
+  thiago: 'Olá Thiago, tenho interesse em treinar na Team Alpha!',
   geral: 'Olá Team Alpha! Gostaria de mais informações sobre as aulas.',
   unidade: (nome) => `Olá Team Alpha! Tenho interesse em conhecer a unidade ${nome}.`,
 }

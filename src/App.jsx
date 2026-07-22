@@ -10,8 +10,21 @@ import Unidades from './components/Unidades'
 import Contato from './components/Contato'
 import Footer from './components/Footer'
 import WhatsAppFloat from './components/WhatsAppFloat'
+import AdminApp from './admin/AdminApp'
+
+// Detecta se estamos na rota /admin (single-page com check simples de pathname).
+// Não usamos react-router para manter o bundle leve.
+function isAdminRoute() {
+  if (typeof window === 'undefined') return false
+  const p = window.location.pathname
+  return p === '/admin' || p === '/admin/' || p.startsWith('/admin/')
+}
 
 export default function App() {
+  if (isAdminRoute()) {
+    return <AdminApp />
+  }
+
   return (
     <>
       <Navbar />
